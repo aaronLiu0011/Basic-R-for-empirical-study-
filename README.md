@@ -17,5 +17,5 @@ This course was taught by Andrew Griffen(https://github.com/andrew-griffen), who
 - [Assignment 9](Assignment9): Analysis and visualization
 
 ## Acknowledgements
-Special thanks to Andrew Griffen(https://github.com/andrew-griffen) for their support and guidance throughout the course.
+Special thanks to Andrew Griffen(https://github.com/andrew-griffen) for the support and guidance throughout the course.
 
