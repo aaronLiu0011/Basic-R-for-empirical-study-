@@ -1,0 +1,167 @@
+---
+title: "Homework 6"
+author: "LIU Aoran"
+date: "2024-04-29"
+output: pdf_document
+---
+
+Full name: LIU Aoran
+
+Preferred name: Aaron
+
+ID: 29246040
+
+```{r,include=FALSE}
+# install_github("andrew-griffen/gdata")
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(jtools)
+library(devtools)
+library(tidyverse)
+library(stringi)
+library(stringr)
+library(ggplot2)
+library(gdata)
+library(tidyr)
+```
+
+# Task 1
+
+```{r}
+setwd("/Users/okuran/Desktop/R for empirical economics")
+
+# Read the CSV file into R
+netflix_data <- read.csv("netflix_titles.csv")
+
+# Check the structure of the dataset
+str(netflix_data)
+```
+
+# Task 2
+
+```{r}
+# Delete the columns containing "X"
+netflix_data <- netflix_data |>
+  select(-contains("X"))
+
+# Check the structure of the dataset
+str(netflix_data)
+```
+
+# Task 3
+
+```{r}
+# Create the "length" variable for movies
+netflix_data <- netflix_data |>
+  mutate(length = if_else(type == "Movie", 
+                          as.numeric(str_replace(str_squish(duration), " min", "")),
+                          NA_real_))
+
+# Create the "seasons" variable for TV shows
+netflix_data <- netflix_data |>
+  mutate(seasons = if_else(type == "TV Show",
+                           as.numeric(str_replace(str_squish(duration), " Season[s]*", "")),
+                           NA_real_))
+
+# Remove the "duration" column as it's no longer needed
+netflix_data <- netflix_data |>
+  select(-duration)
+
+str(netflix_data) 
+```
+# Task 4
+```{r}
+# Create scatter plot
+ggplot(data = netflix_data, aes(x = release_year, y = seasons)) +
+  geom_point() +
+  labs(x = "Release Year", y = "Number of Seasons") +
+  ggtitle("Relationship Between Release Year and Number of Seasons")
+```
+The scatter plot shows an increase in the number of seasons for TV shows released in more recent years.
+
+This could be due to various factors such as:
+
+1. Streaming Platforms: With the rise of streaming platforms like Netflix, Amazon Prime, and Hulu, there might be increased demand for long-running TV shows to keep subscribers engaged over extended periods.
+2. Audience Preferences: Audience preferences may have shifted towards binge-watching longer series, leading producers to create more seasons for popular shows.
+3. Economic Factors: Producing additional seasons of successful TV shows can be financially lucrative for production companies and streaming platforms, leading to a greater incentive to extend series.
+
+# Task 5
+```{r}
+# Create scatter plot for movie length against release year
+ggplot(data = netflix_data, aes(x = release_year, y = length)) +
+  geom_point() +
+  labs(x = "Release Year", y = "Movie Length (minutes)") +
+  ggtitle("Relationship Between Release Year and Movie Length")
+```
+the scatter plot shows a concentration of points at shorter movie lengths for movies released in more recent years, it suggests a trend towards producing more short movies over time.
+
+This observation could be due to various factors such as:
+
+1. Changing Audience Preferences: Audience preferences may have shifted towards shorter content, influenced by changes in viewing habits and attention spans.
+2. Diversity in Filmmaking: There may be a growing diversity of filmmakers and storytelling styles, leading to the production of more short films alongside traditional feature-length movies.
+3. Accessibility of Filmmaking Tools: Advances in technology have made filmmaking more accessible, allowing filmmakers to create and distribute short films more easily than before.
+
+# Task 6 & 7
+```{r}
+head(expenditure_data1)
+
+# Compute total expenditure for each individual
+expenditure_data1$total_expenditure <- 
+  rowSums(expenditure_data1[, c("food", "clothing", "housing", "alcohol")], na.rm = TRUE)
+
+head(expenditure_data1)
+```
+Each category of expenditure (food, clothing, housing, alcohol) is represented as a separate column. In tidy data, each variable should be a column. Instead, the categories are spread across multiple columns, which makes it difficult to work with and analyze the data efficiently.
+
+And each row represents an individual, but the expenditures are spread across multiple columns. This violates the tidy data principle that each observation should be in its own row. Instead, the data presents multiple observations (expenditures in different categories) in one row, making it harder to perform certain analyses without reshaping the data.
+
+# Task 8
+```{r}
+long_expenditure_data <- expenditure_data1 |>
+  select(-total_expenditure) |>  # Exclude the total_expenditure column
+  pivot_longer(cols = food:alcohol, 
+               names_to = "category", 
+               values_to = "expenditure")
+
+head(long_expenditure_data)
+```
+
+# Task 9 & 10
+```{r}
+total_expenditure_per_individual <- long_expenditure_data |>
+  group_by(id) |>
+  summarise(total_expenditure = sum(expenditure))
+
+total_expenditure_per_individual
+```
+I prefer the second approach. Because it will be more flexible if we want to add more entries later.
+
+With the longer dataset structure, adding new entries simply involves appending additional rows with the corresponding "id", "category", and "expenditure" values. When we re-run the code to calculate total expenditures using group_by() and summarise(), it will automatically include the new entries in the calculation without requiring any changes to the code itself.
+
+# Task 11~13
+```{r}
+print(expenditure_data2)
+```
+The expenditure_data2 dataset has 201 columns.
+
+If we were to write code to compute the total expenditures without making the dataset longer, the code might be very long and repetitive as the code to calculate the total expenditure for each individual would involve referencing each column explicitly by name (e.g., c(item1, item2, ..., item201)).
+
+# Task 14 & 15
+```{r}
+# Reshape the dataset to longer format
+long_expenditure_data2 <- expenditure_data2 |>
+  pivot_longer(cols = starts_with("item"), 
+               names_to = "item", 
+               values_to = "expenditure")
+
+# Calculate total expenditure for each individual
+total_expenditure_per_individual2 <- long_expenditure_data2 |>
+  group_by(id) |>
+  summarise(total_expenditure = sum(expenditure, na.rm = TRUE))
+
+total_expenditure_per_individual2
+```
+By reshaping the dataset into a longer format, we reduce the need for repetitive code. Instead of referencing each expenditure item individually in the code, we transform multiple columns into rows, making the code more concise.
+
+And the longer format results in code that is easier to read and understand. It clearly communicates the data transformation steps (reshaping the dataset) and the analysis steps (calculating total expenditure), making the code more intuitive for others to follow.

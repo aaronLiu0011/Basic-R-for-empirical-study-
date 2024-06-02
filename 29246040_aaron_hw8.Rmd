@@ -1,0 +1,173 @@
+---
+title: "Homework 8"
+author: "LIU Aoran"
+date: "2024-05-08"
+output: pdf_document
+---
+
+Full name: LIU Aoran
+
+Preferred name: Aaron
+
+ID: 29246040
+
+```{r}
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("tidyr")) install.packages("tidyr")
+if (!require("dbplyr")) install.packages("dbplyr")
+if (!require("magrittr")) install.packages("magrittr")
+if (!require("ggplot2")) install.packages("ggplot2")
+
+library(usethis)
+library(dplyr)
+library(tidyr)
+library(dbplyr)
+library(magrittr)
+library(ggplot2)
+library(knitr)
+library(devtools)
+library(tidyverse)
+library(pacman)
+library(ggthemes)
+
+# install_github("andrew-griffen/gdata")
+# install_github("andrew-griffen/griffen")
+
+library(gdata)
+library(griffen)
+library(hrbrthemes)
+library(tidyverse)
+library(extrafont)
+extrafont::loadfonts(quiet=TRUE, device='pdf')
+theme_set(theme_ipsum())
+```
+
+# Task 1
+
+```{r}
+update_geom_font_defaults()
+
+p <- ggplot(data = clark) +
+  geom_path(aes(x = population, y = realwage), color = "black") + 
+    geom_label(
+    data = clark %>% filter(year %in% c(1450, 1300, 1650, 1860)),
+    aes(x = population, y = realwage, label = year),
+    fill = "white",        # White background
+    color = "black",       # Black text
+    label.size = 0.4,      # Size of the label border
+    label.padding = unit(0.3, "lines")  # Padding around the text within the label
+  ) +
+  labs(title = "Real Wages and Population",
+       subtitle = "England: Years 1210 - 1860",
+       x = "Population",
+       y = "Real wage",
+       caption = "Source: A Farewell to Alms by Gregory C. Clark")
+
+print(p)
+```
+
+# Task 2
+
+The S&P 500, or Standard & Poor's 500, is a stock market index that measures the stock performance of 500 large companies listed on stock exchanges in the United States.
+
+The weight of each company in the S&P 500 is determined by its market cap relative to the total market cap of all 500 companies in the index. 
+
+Like every other broad stock market index, the S&P 500's sector weightings change daily, but obviously by small amounts. Over the longer term, sector weights change dramatically as different industries rise and fall in terms of sustainable profitability and return on capital. It may change due to:
+
+1. Market Dynamics: As the stock prices of the constituent companies change due to market dynamics, their market capitalizations change, thereby changing their weights in the index.
+
+2. Quarterly Rebalancing: The index is rebalanced quarterly to adjust the weights of the companies. During this rebalancing, the index committee reviews and adjusts the composition of the index as necessary to ensure that it reflects the current state of the stock market.
+
+3. Corporate Actions: Corporate actions such as mergers, acquisitions, or spin-offs also necessitate changes in the weights. For example, if a company in the index splits its stock, this will affect its share count and potentially its market cap, thereby affecting its weight in the index.
+
+4. Addition and Removal of Companies: Companies can be added or removed from the index based on the index committee's criteria. This typically happens when a company no longer meets the criteria due to financial reasons, or when a more significant company needs to be included to reflect the market better.
+
+# Task 3
+
+```{r}
+summary_statistics <- summary(sp$returns)
+summary_statistics
+mean_return <- mean(sp$returns)
+```
+
+In financial terms, "large" typically refers to returns that substantially exceed the risk-free rate or a predetermined benchmark such as the historical average. A common benchmark for "low risk" in the U.S. is the return on 10-year Treasury bonds, which historically range around 2% to 4% over various periods.
+
+The data shows an average annual return of the S&P 500 from 1928 to 2023 is `r mean_return*100`%, which is notably higher than typical safe investments (e.g., bonds) and therefore could be considered "large" from a risk-reward perspective, indicating a good return on riskier equity investments.
+
+# Task 4
+```{r}
+p <- ggplot(data = sp, aes(x = year, y = returns, fill = returns > 0)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_manual(values = c("TRUE" = "darkred", "FALSE" = "darkgrey")) +
+  labs(title = "S&P Annual Returns 1928 - 2023",
+       x = "Year",
+       y = "Returns") 
+
+print(p)
+```
+
+# Task 5
+
+The color choice of red and grey is quite counterintuitive.
+
+Red, traditionally associated with warnings or losses in Western financial contexts, is an unconventional choice here. Typically, green is used to signify gains as it symbolizes growth and positivity.
+
+On the other hand grey is a neutral, subdued color, often used in visualizations to represent negative, null, or excluded values, which fits its use here but lacks the strong emotional impact usually associated with losses.
+
+To align with standard financial visualizations and improve intuitive understanding, I would recommend swapping the color scheme:
+
+* Green for Positive Returns: Green is universally recognized in finance for indicating positive growth and gains. Using green for positive years aligns with viewer expectations and immediately communicates success or gain.
+
+* Red for Negative Returns: Red naturally draws attention and is commonly associated with danger or stop signals, making it effective for highlighting losses or negative returns.
+
+```{r}
+p <- ggplot(data = sp, aes(x = year, y = returns, fill = returns > 0)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_manual(values = c("TRUE" = "darkgreen", "FALSE" = "darkred")) +
+  labs(title = "S&P Annual Returns 1928 - 2023",
+       x = "Year",
+       y = "Returns") 
+
+print(p)
+```
+
+# Task 6 & 7
+
+```{r}
+sp <- sp %>%
+  arrange(year) %>%
+  mutate(
+    cumulative_returns = cumprod(1 + returns)
+  )
+
+p <- ggplot(data = sp, aes(x = year, y = cumulative_returns)) +
+  geom_line() + 
+  labs(title = "Returns S&P 500",
+       subtitle = "Years 1928 - 2023",
+       x = "Year",
+       y = NULL)
+
+print(p)
+```
+
+# Task 8
+
+```{r}
+cumulative_return_2023 <- filter(sp, year == 2023)$cumulative_returns
+
+# Define various initial sums of money
+initial_investments <- c(100, 500, 1000, 5000, 10000)  
+
+final_amounts <- initial_investments * cumulative_return_2023
+
+results <- data.frame(
+  Initial_Investment = initial_investments,
+  Final_Amount = final_amounts
+)
+
+print(results)
+```
+
+# Task 9
+
+I would encourage my ancestors to start investing early and continue to do so on a regular basis. This volatility in the stock market may be difficult for my family to remain patient and emotionally resilient, especially during market downturns such as the Great Recession and the 2008 financial crisis. Perhaps I will maintain my commitment to a long-term investment strategy by starting to invest now and educating my offspring about the nature of the stock market and the historical performance of their investments.

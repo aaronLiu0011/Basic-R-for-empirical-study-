@@ -1,0 +1,155 @@
+---
+title: "Homework 7"
+author: "LIU Aoran"
+date: "2024-05-03"
+output: pdf_document
+---
+
+Full name: LIU Aoran
+
+Preferred name: Aaron
+
+ID: 29246040
+
+```{r}
+# install.package("datasauRus")
+library(dplyr)
+library(knitr)
+library(devtools)
+library(tidyverse)
+library(datasauRus)
+library(ggplot2)
+
+```
+
+# Task 1~3
+
+```{r}
+?datasauRus::datasaurus_dozen
+```
+
+The Datasaurus Dozen consists of thirteen different datasets, each with the same summary statistics (mean, variance, correlation, etc.), but drastically different distributions and visual patterns.
+
+The thirteen data sets were labeled as the following:
+
+```{r echo=FALSE}
+dataset_names <- unique(datasauRus::datasaurus_dozen$dataset)
+cat(paste(dataset_names, collapse="\n"))
+```
+
+# Task 4
+
+```{r}
+# Creating the scatter plot, faceted by 'dataset'
+plot_datasaurus <- ggplot(datasauRus::datasaurus_dozen, aes(x = x, y = y)) + 
+  geom_point() +  # Adds a scatter plot
+  facet_wrap(~ dataset, scales = "free") +  # Facets by 'dataset'
+  labs(title = "Scatter Plot of y against x for each Dataset in Datasaurus Dozen", 
+       x = "X-axis", 
+       y = "Y-axis") + 
+  theme_minimal()  # Uses a minimal theme
+
+# Print the plot
+print(plot_datasaurus)
+```
+
+# Task 5
+
+Here is the summary statistics:
+```{r}
+summary_stats <- datasauRus::datasaurus_dozen %>% 
+  group_by(dataset) %>% 
+  summarise(
+    Mean_X = mean(x),
+    SD_X = sd(x),
+    Mean_Y = mean(y),
+    SD_Y = sd(y)
+  )
+
+print(summary_stats)
+```
+
+# Task 6
+
+Identical summary statistics can mask dramatically different distributions, so that relying solely on summary statistics can be misleading.
+
+# Task 7
+
+```{r}
+library(palmerpenguins)
+# Creating the scatter plot, faceted by 'dataset'
+penguins <- na.omit(penguins)
+penguins_colors <- c("darkorange", "purple", "cyan4")
+plot_penguins <- ggplot(
+  penguins, 
+  mapping = aes(x = flipper_length_mm, y = bill_length_mm, color = species)) + 
+  geom_point() +
+  facet_wrap(~ species, scales = "fixed") +  # Facets by 'dataset'
+  labs(title = "Flipper and Bill Length", 
+       x = "Flipper length (mm)", 
+       y = "Bill length (mm)"
+       ) + 
+  scale_color_manual(values = penguins_colors)
+
+print(plot_penguins)
+
+```
+
+# Task 8
+
+```{r}
+plot_penguins1 <- plot_penguins  + theme_bw()
+
+print(plot_penguins1)
+```
+
+# Task 9
+
+```{r}
+plot_penguins2 <- plot_penguins  + theme_minimal()
+
+print(plot_penguins2)
+```
+
+# Task 10
+```{r}
+print(penguins_colors)
+
+names(penguins_colors) <- c("Adelie", "Chinstrap", "Gentoo")
+
+print(penguins_colors)
+```
+
+# Task 11
+```{r}
+plot_penguins_reorder <- ggplot(
+  penguins, 
+  mapping = aes(x = flipper_length_mm, y = bill_length_mm, color = species)) + 
+  geom_point() +
+  facet_wrap(~ species, scales = "fixed") +  # Facets by 'dataset'
+  labs(title = "Flipper and Bill Length", 
+       x = "Flipper length (mm)", 
+       y = "Bill length (mm)"
+       ) + 
+  scale_color_manual(values = penguins_colors[c("Gentoo", "Chinstrap", "Adelie")])
+
+print(penguins_colors[c("Gentoo", "Chinstrap", "Adelie")])
+print(plot_penguins_reorder)
+```
+
+# Taks 12
+```{r}
+penguins$species <- factor(penguins$species, levels = c("Gentoo", "Chinstrap", "Adelie"))
+plot_penguins <- ggplot(
+  penguins, 
+  mapping = aes(x = flipper_length_mm, y = bill_length_mm, color = species)) + 
+  geom_point() +
+  facet_wrap(~ species, scales = "fixed") +  # Facets by 'dataset'
+  labs(title = "Flipper and Bill Length", 
+       x = "Flipper length (mm)", 
+       y = "Bill length (mm)"
+       ) + 
+  scale_color_manual(values = penguins_colors)
+
+print(plot_penguins)
+```

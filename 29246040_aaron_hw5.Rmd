@@ -1,0 +1,118 @@
+---
+title: "Homework 5"
+author: "LIU Aoran"
+date: "2024-04-22"
+output: pdf_document
+---
+
+Full name: LIU Aoran
+
+Preferred name: Aaron
+
+ID: 29246040
+
+```{r}
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(jtools)
+library(devtools)
+library(tidyverse)
+library(griffen)
+library(gdata)
+library(stringi)
+library(palmerpenguins)
+```
+
+# Task 1~3
+
+```{r}
+
+# Add a new variable 'mass_flipper_ratio' to the penguins data frame
+penguins <- penguins |>
+  mutate(mass_flipper_ratio = body_mass_g / flipper_length_mm)
+
+# Move the newly created variable to the first column using Griffen's verbs
+penguins |> left(mass_flipper_ratio,body_mass_g,flipper_length_mm)
+
+```
+
+The variable name mass_flipper_ratio is descriptive and indicates what the variable represents: the ratio of body mass to flipper length for each penguin observation. By including both "mass" and "flipper" in the variable name, it explicitly communicates the two variables involved in the calculation of the ratio.
+
+# Task 4~7
+
+```{r}
+# Compute the mean value of mass_flipper_ratio for each species
+mean_mass_flipper_ratio <- penguins |>
+  group_by(species) |>
+  summarize(mean_mass_flipper_ratio = mean(mass_flipper_ratio, na.rm = TRUE))
+
+# View the computed mean values
+print(mean_mass_flipper_ratio)
+```
+
+These results indicate that, on average, Chinstrap penguins have the lowest ratio of body mass to flipper length, while Gentoo penguins have the highest ratio among the three species in the dataset.
+
+```{r}
+# Change the name of the variable
+penguins <- penguins |>
+  rename(body_flipper_ratio = mass_flipper_ratio)
+
+penguins |> left(body_flipper_ratio)
+
+```
+
+# Task 8
+```{r}
+# Identify factor variables in the penguins data frame
+factor_variables <- sapply(penguins, is.factor)
+
+# Loop through each factor variable
+for (var_name in names(factor_variables)[factor_variables]) {
+  # Extract levels of the factor variable
+  var_levels <- levels(penguins[[var_name]])
+  
+  # Determine if the factor variable is ordered
+  is_ordered <- is.ordered(penguins[[var_name]])
+  
+  # Print variable name, levels, and order information
+  cat("Variable:", var_name, "\n")
+  cat("Levels:", paste(var_levels, collapse = ", "), "\n")
+  cat("Ordered:", is_ordered, "\n\n")
+}
+
+# Print the names of factor variables
+print(names(factor_variables)[factor_variables])
+```
+1. Species: The species variable has three levels: Adelie, Chinstrap, and Gentoo. This suggests that the species variable represents the species of penguins observed in the dataset, and each penguin observation belongs to one of these three species.
+
+2. Island: The island variable has three levels: Biscoe, Dream, and Torgersen. This suggests that the island variable represents the location or island where the penguins were observed, and each observation belongs to one of these three islands.
+
+3. Sex: This indicates the sex of the penguins observed in the dataset. The sex variable has two levels: female and male. This suggests that the sex variable represents the biological sex of the penguins, and each observation belongs to one of these two categories.
+
+*Ordered*: The Ordered information indicates whether the factor levels have an inherent order. In this case, all factors are not ordered (Ordered: FALSE), which means that the levels of the factors are considered as unordered categories.
+
+# Task 10
+```{r}
+# Change the order of factor levels in the 'sex' variable
+penguins <- penguins |>
+  mutate(sex = fct_relevel(sex, "male", "female"))
+
+levels(penguins$sex)
+```
+
+# Task 11
+```{r}
+# Redo the regression of body_mass_g on sex
+regression_result <- lm(body_mass_g ~ sex, data = penguins)
+
+# View the regression summary
+summ(regression_result)
+```
+
+By changing the factor order in the sex variable, we may change the reference category used in the regression. The reference category is typically the first level of the factor variable. In this case, after changing the factor order so that "Female" comes before "Male", "Female" becomes the reference category.
+
+Therefore, the regression coefficients obtained from the updated regression will represent the difference in body mass between males and females relative to the reference category (female). If the original regression was done with "Male" as the reference category, changing the factor order would lead to a reversal in the sign of the regression coefficient for "sex" (indicating the effect of being male relative to being female), but the magnitude of the coefficient would remain the same.
+
+In summary, changing the factor order can affect the interpretation of regression coefficients by altering the reference category, but it does not change the fundamental relationship between the predictor and the outcome variable.
+

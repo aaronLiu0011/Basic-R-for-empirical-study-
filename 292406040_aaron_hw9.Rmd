@@ -1,0 +1,226 @@
+---
+title: "Homework 10"
+author: "LIU Aoran"
+date: "2024-05-21"
+output: pdf_document
+---
+
+Full name: LIU Aoran
+
+Preferred name: Aaron
+
+ID: 29246040
+
+```{r}
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("tidyr")) install.packages("tidyr")
+if (!require("dbplyr")) install.packages("dbplyr")
+if (!require("magrittr")) install.packages("magrittr")
+if (!require("ggplot2")) install.packages("ggplot2")
+
+library(usethis)
+library(dplyr)
+library(tidyr)
+library(dbplyr)
+library(magrittr)
+library(ggplot2)
+library(knitr)
+library(devtools)
+library(tidyverse)
+library(pacman)
+library(ggthemes)
+library(scales)
+library(ggrepel)
+
+
+
+# install_github("andrew-griffen/gdata")
+# install_github("andrew-griffen/griffen")
+
+library(gdata)
+library(griffen)
+library(hrbrthemes)
+library(tidyverse)
+library(extrafont)
+library(palmerpenguins)
+library(hrbrthemes)
+library(gt)
+library(gtExtras)
+library(webshot2)
+library(broom)
+library(sf)
+p_load(gapminder,ggthemes,Hmisc,wesanderson,ggridges)
+
+extrafont::loadfonts(quiet=TRUE, device='pdf')
+theme_set(theme_ipsum())
+```
+
+# Task 1
+```{r}
+growth <- function(data) {
+  model <- lm(log(gdpPercap) ~ year, data)
+  return(tidy(model))
+}
+
+gapminder_nested <- gapminder |>
+  group_by(country) |>
+  nest()
+
+gapminder_coef <- gapminder_nested |>
+  mutate(tidy_model = map(data, growth)) |>
+  unnest(tidy_model)
+
+gapminder_ycoef <- gapminder_coef |>
+  filter(term == "year")
+
+country_continent <- gapminder |>
+  select(country, continent) |>
+  distinct()
+
+country_info <- gapminder |>
+  group_by(country) |>
+  filter(year == max(year)) |>
+  select(country, continent, pop) |>
+  distinct()
+
+gapminder_ycoef <- gapminder_ycoef |>
+  left_join(country_info, by = "country")
+
+gapminder_ycoef <- gapminder_ycoef |>
+  mutate(conf.low = estimate - 1.96 * std.error,
+         conf.high = estimate + 1.96 * std.error)
+
+gapminder_ycoef <- gapminder_ycoef |>
+  arrange(continent, country)
+
+gapminder_ycoef <- gapminder_ycoef |>
+  select(-data, -term)
+```
+
+```{r}
+
+# Create the plot
+p <- ggplot(gapminder_ycoef |> filter(continent != "Oceania"), aes(x = reorder(country, estimate), y =estimate, color = country)) +
+  geom_point(size = 1) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
+  scale_color_manual(values = country_colors) +
+  facet_wrap(~ continent, scales = "free") +
+  coord_flip() +
+  geom_hline(yintercept = 0, linetype = "solid", color = "black") +
+  scale_y_continuous(limits = c(-0.05, 0.075)) +
+  labs(
+    title = "Annual Growth in Per Capita GDP",
+    subtitle = "1952 - 2007",
+    x = "",
+    y = "Growth Rate",
+    caption = "Source: Gapminder data, bars represent 95% confidence intervals, zero growth highlighted with black line."
+  ) +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 10, face = "bold"),
+    axis.text.y = element_text(size = 4, hjust = 1),
+    axis.text.x = element_text(size = 6, hjust = 1)
+    )
+  
+
+ggsave("annualGrowth_plot.png", plot = p, width = 17, height = 14 , units = "cm")
+
+```
+```{r, out.width="120%"}
+knitr::include_graphics("/Users/okuran/Desktop/R for empirical economics/annualGrowth_plot.png")
+```
+
+# Task 2
+```{r}
+ggplot(data = us_sf) + geom_sf()
+```
+
+# Task 3 & 4 (US Electoral College System)
+
+The U.S. Electoral College is a system used to elect the President and Vice President. Each state gets a number of electors equal to its total number of Senators and Representatives. There are 538 electors in total, with 270 needed to win. Most states use a winner-take-all approach, where the candidate with the most votes in a state wins all its electoral votes. 
+
+# Task 5
+
+```{r}
+trump_biden <- trump_biden |>
+  mutate(prediction = ifelse(trump_polls > biden_polls, "Trump", "Biden"))
+
+print(trump_biden)
+```
+
+# Task 6
+```{r}
+electoral_votes_summary <- trump_biden |>
+  group_by(prediction) |>
+  summarise(total_electoral_votes = sum(electoral_votes))
+
+print(electoral_votes_summary)
+
+predicted_winner <- electoral_votes_summary |>
+  filter(total_electoral_votes == max(total_electoral_votes)) |>
+  pull(prediction)
+```
+
+If the polls are accurate and do not change before November, the predicted next U.S. President would be: `r predicted_winner`
+
+# Task 7
+```{r}
+joined_data <- left_join(us_sf, trump_biden, by = "iso3166_2")
+
+print(joined_data)
+```
+
+# Task 8
+```{r}
+ggplot(data = joined_data) +
+  geom_sf(aes(fill = prediction))
+```
+
+# Task 9
+```{r}
+party_colors <- c("Trump" = "#CB454A", "Biden" = "#2E74C0")
+
+ggplot(data = joined_data) +
+  geom_sf(aes(fill = prediction)) +
+  scale_fill_manual(values = party_colors) +
+  labs(title = "2024 US Presidential Election Predictions by State",
+       fill = "Predicted Winner")
+```
+
+# Task 10
+```{r}
+penguin_summary <- penguins |>
+  filter(!is.na(bill_length_mm) & !is.na(bill_depth_mm) & !is.na(flipper_length_mm) & !is.na(body_mass_g) & !is.na(sex)) |>
+  group_by(sex, species) |>
+  summarise(
+    body_mass_g = round(mean(body_mass_g, na.rm = TRUE), 0),
+    flipper_length_mm = round(mean(flipper_length_mm, na.rm = TRUE), 0),
+    bill_length_mm = round(mean(bill_length_mm, na.rm = TRUE), 2),
+    bill_depth_mm = round(mean(bill_depth_mm, na.rm = TRUE), 2)
+  )
+
+penguin_gt_table <- penguin_summary |>
+  gt() |>
+  tab_header(
+    title = "Palmer penguin allometry by species and sex"
+  ) |>
+  cols_label(
+    sex = "",
+    species = "",
+    body_mass_g = "BODY MASS (G)",
+    flipper_length_mm = "FLIPPER LENGTH (MM)",
+    bill_length_mm = "BILL LENGTH (MM)",
+    bill_depth_mm = "BILL DEPTH (MM)"
+    ) |>
+  tab_footnote(
+    footnote = "Note: Data were collected at Palmer Archipelago, Antarctica 2007 - 2009.") |>
+  gt_theme_538()
+  
+gtsave(penguin_gt_table, "penguin_gt_table.png")
+
+```
+```{r, echo=FALSE, out.width="100%"}
+knitr::include_graphics("penguin_gt_table.png")
+```
+
+

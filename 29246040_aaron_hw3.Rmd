@@ -1,0 +1,87 @@
+---
+title: "Homework3"
+author: "LIU Aoran"
+output: pdf_document
+date: "2024-04-16"
+bibliography: hw3_references.bib
+csl: apa.csl
+---
+
+Full name: LIU Aoran
+
+Preferred name: Aaron
+
+ID: 29246040
+
+# Task 1
+
+A code chunk option eval = FALSE to show some code but not evaluate it.
+
+```{r, eval = FALSE}
+eval_f <- c(1,2,3)
+```
+
+# Task 2
+
+In a code chunk use the option error = TRUE to demonstrate that the code above did not actually run.
+
+```{r, error=TRUE}
+eval_f + 1
+```
+
+# Task 3
+
+```{r, echo=FALSE}
+print("Hello World")
+```
+
+# Task 4
+
+```{r}
+x <- 5  # radius of a circle
+```
+
+For a circle with the radius `r x`,
+its area is `r pi * x^2`.
+
+# Task 5
+
+Only the wise can see the code.
+
+```{r, include=FALSE}
+knitr::include_graphics("/Users/okuran/Downloads/R for empirical economics/emperor-clothes.png")
+```
+
+# Task 6
+```{R}
+# Define a function to calculate the sum of a vector
+sum_vector <- function(vec) {
+    # Calculate the sum of the vector
+    sum_value <- sum(vec, na.rm = TRUE)
+    
+    # Return the sum
+    return(sum_value)
+}
+```
+
+# Task 7
+
+According to Griffen [@griffen2019evaluating], he explored the role of childcare policies in the development of early cognitive skills.
+
+# About References
+
+I choose to use APA citation style for the reason that APA style provides style and writing guidelines to make sure the research paper is easy to read and has all of the necessary elements. 
+
+The primary purpose of APA style is to promote scientific communication by facilitating clarity of expression and standardizing the organization and content of manuscript formatting.
+
+By having different CSL files available, we can ensure our work adheres to the citation style required by the field or academic institution.
+
+Different citation styles help ensure consistency and accuracy in referencing, making it easier for readers to locate sources and verify information.
+
+\newpage
+
+# References
+
+
+
+

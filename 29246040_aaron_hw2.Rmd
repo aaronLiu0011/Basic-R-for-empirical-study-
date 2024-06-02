@@ -1,0 +1,124 @@
+---
+title: "Homework2"
+author: "LIU Aoran"
+output: pdf_document
+date: "2024-04-13"
+---
+
+Full name: LIU Aoran
+
+Preferred name: Aaron
+
+ID: 29246040
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1
+
+I created a Rosenbrock’s banana function that accepts two arguments x and y and two parameters which are typically a = 1 and b = 100. And then I calculated the function with four different values of x and y.
+
+```{r banana}
+# Set parameters a and b in the global environment
+a <- 1
+b <- 100
+
+# Define the Rosenbrock function
+rosenbrock_function <- function(x, y) {
+    f <- (a - x)^2 + b * (y - x^2)^2
+    return(f)
+}
+
+# Test the Rosenbrock function with different values of x and y
+
+# Case 1: x = 1, y = 1
+result1 <- rosenbrock_function(1, 1)
+print(paste("Rosenbrock function value for x = 1 and y = 1:", result1))
+
+# Case 2: x = -1, y = 1
+result2 <- rosenbrock_function(-1, 1)
+print(paste("Rosenbrock function value for x = -1 and y = 1:", result2))
+
+# Case 3: x = 0, y = 0
+result3 <- rosenbrock_function(0, 0)
+print(paste("Rosenbrock function value for x = 0 and y = 0:", result3))
+
+# Case 4: x = 1.5, y = 2
+result4 <- rosenbrock_function(1.5, 2)
+print(paste("Rosenbrock function value for x = 1.5 and y = 2:", result4))
+```
+
+## Task 2
+
+I called my function with the arguments by name and by position.
+
+```{r}
+# Call the function with arguments by position
+result_position <- rosenbrock_function(1.5, 2)
+print(paste("Result when calling with arguments by position (x = 1.5, y = 2):", 
+            result_position))
+
+# Call the function with arguments by name
+result_name <- rosenbrock_function(x = 1.5, y = 2)
+print(paste("Result when calling with arguments by name (x = 1.5, y = 2):", 
+            result_name))
+
+# Call the function with arguments by name in reverse order
+result_name_reversed <- rosenbrock_function(y = 2, x = 1.5)
+print(
+  paste("Result when calling with arguments by name in reverse order (y = 2, x = 1.5):", 
+            result_name_reversed))
+
+# Compare the results
+if (result_position == result_name && result_name == result_name_reversed) {
+    print("The results are consistent across all function calls.")
+} else {
+    print("The results vary across function calls.")
+}
+```
+
+By running the code, I found that the results from calling the function with arguments by position, by name, and by name in reverse order are all the same, demonstrating that when calling a function with arguments by name, their positions do not matter.
+
+## Task 3
+
+I created a second banana function that instead has 4 arguments x, y, a, and b with default values for a = 1 and b = 100.
+
+```{r}
+rosenbrock_function_default <- function(x, y, a = 1, b = 100) {
+    f <- (a - x)^2 + b * (y - x^2)^2
+    return(f)
+}
+```
+
+And then calling the function with and without passing values for a and b.
+
+```{r}
+# Call the function without passing values for a and b
+result_default <- rosenbrock_function_default(1.5, 2)
+print(paste("Result with default values for a and b (x = 1.5, y = 2):", result_default))
+
+# Call the function while passing values for a and b
+result_custom <- rosenbrock_function_default(1.5, 2, a = 2, b = 200)
+print(paste("Result with custom values for a and b (x = 1.5, y = 2, a = 2, b = 200):", 
+            result_custom))
+```
+
+## Task 4
+
+The Rosenbrock's function is defined by
+
+$$
+f(x, y) = (a - x)^2 + b \cdot (y - x^2)^2
+$$
+
+## Task 5
+
+Finally, I found a website that contains a dataset that I am interesting in: [Lottery Powerball Winning Numbers: Beginning 2010](https://catalog.data.gov/dataset/lottery-powerball-winning-numbers-beginning-2010).
+
+```{r, out.width="1\\linewidth", include=TRUE, fig.align="left", echo=FALSE}
+knitr::include_graphics("/Users/okuran/Downloads/R for empirical economics/powerball.png")
+```
+
+The Powerball lottery is a popular game of chance played by millions of people across the United States. Participants purchase tickets with the hope of matching the winning numbers and claiming the grand prize. This dataset contains the winning numbers of every Powerball drawing since the game's inception. The data includes the date of each drawing, the numbers that were drawn, and the value of the jackpot. This dataset provides a comprehensive historical record of the Powerball lottery, allowing players to track trends, analyze patterns, and gain insights into the game. Whether you are a casual player or a serious lottery enthusiast, this dataset is a valuable resource for understanding the Powerball lottery and its results.
+
