@@ -7,14 +7,14 @@ This course was taught by Andrew Griffen(https://github.com/andrew-griffen), who
 
 ## Contents
 
-- [Assignment 2](Assignment2/README.md): Function utilization
-- [Assignment 3](Assignment3/README.md): Function creation
-- [Assignment 4](Assignment4/README.md): Regression analysis
-- [Assignment 5](Assignment5/README.md): Regression analysis
-- [Assignment 6](Assignment6/README.md): Analysis and visualization
-- [Assignment 7](Assignment7/README.md): Analysis and visualization
-- [Assignment 8](Assignment8/README.md): Analysis and visualization
-- [Assignment 9](Assignment9/README.md): Analysis and visualization
+- [Assignment 2](Assignment2): Function utilization
+- [Assignment 3](Assignment3): Function creation
+- [Assignment 4](Assignment4): Regression analysis
+- [Assignment 5](Assignment5): Regression analysis
+- [Assignment 6](Assignment6): Analysis and visualization
+- [Assignment 7](Assignment7): Analysis and visualization
+- [Assignment 8](Assignment8): Analysis and visualization
+- [Assignment 9](Assignment9): Analysis and visualization
 
 ## Acknowledgements
 Special thanks to Andrew Griffen(https://github.com/andrew-griffen) for their support and guidance throughout the course.
